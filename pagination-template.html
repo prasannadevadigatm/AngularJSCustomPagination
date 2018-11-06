@@ -1,0 +1,36 @@
+<div class="pagination">
+    <ul>
+        <li ng-click="gotoPage('first')" ng-if="isNotFirstPage()">
+            <a>
+                First
+            </a>
+        </li>
+        <li ng-click="gotoPage('prev')" ng-if="isNotFirstPage()">
+            <a>
+                Prev
+            </a>
+        </li>
+        <li ng-click="gotoPage(i)" ng-repeat="i in [] | paginateLoop:lowerLimit():pageCount |limitTo:5" ng-class="currentPage == i && 'active'"> 
+            <a> 
+                <i>{{i+1}}</i> 
+            </a> 
+        </li>
+        <li ng-click="gotoPage('next')" ng-if="isNotLastPage()">
+            <a>
+               Next 
+            </a>
+        </li>
+        <li ng-click="gotoPage('last')" ng-if="isNotLastPage()">
+            <a>
+                Last
+            </a>
+        </li>
+    </ul>
+    <ul class="pull-right">
+        <li>Page No 
+            <input type="text" ng-model="data.page_number" name="" class="input-control" /> 
+            <button class="btn btn-sm btn-primary" ng-disabled="!data.page_number" ng-click="goto(data.page_number)">Go</button> 
+            Total Pages : {{pageCount}}
+        </li>
+    </ul>
+</div>

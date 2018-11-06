@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pagination Directive</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style type="text/css">
+        .container{
+            margin-top:20px;
+        }
+        .pagination ul{
+            display: inline-block !important;
+        }
+        .pagination ul li{
+            display: inline !important;
+        }
+        .pagination ul > li > a{
+            float: left;
+            padding: 4px 12px;
+            line-height: 20px;
+            text-decoration: none;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-left-width: 0;
+            cursor:pointer;
+        }
+        .pagination ul > li:first-child > a{
+            border-left-width: 1px;
+            -webkit-border-bottom-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            -webkit-border-top-left-radius: 4px;
+            border-top-left-radius: 4px;
+        }
+        .pagination ul > li.active > a{
+            background-color:#ddd!important;
+            color:#fff;
+        }
+
+        .pagination ul>li:last-child>a {
+            border-right-width: 1px;
+            border-bottom-right-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        .pagination ul li input {
+            width:100px !important;
+            height: 30px;
+        }
+        .pagination ul li button {
+           margin-top: -3px;
+           padding:5px 12px;
+           border-radius: 15px;
+           outline: 0 !important;
+        }
+        .mb0{
+            margin-bottom:0;
+        }
+    </style>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+	<div class="container">
+		<h4 class="text-center">Angular Custom Pagination Directive</h4>
+		<div class="panel panel-default panel-body">
+            <div class="panel panel-default panel-body mb0">
+               <h4 class="text-center">{{data.currentPage + 1}}</h4>
+               <h5 class="text-center">Showing {{data.currentPage + 1}} of {{data.totalNoOfPages}}</h4>
+            </div>
+            <div class="col-sm-12 text-center">
+			    <pagination current-page="data.currentPage" page-count="data.totalNoOfPages" fn="gotoPage">
+                </pagination>
+            </div>
+		</div>
+	</div>
+    
+    <script>
+    var app = angular.module('myApp', []);
+    app.controller('myCtrl', function($scope) {
+        $scope.data = {
+            totalNoOfPages: 100,
+            currentPage: 0
+
+        };
+        $scope.gotoPage = function(page){
+            console.log(page);
+        }
+    });
+    app.filter('paginateLoop', function() {
+        return function(input, start, end) {
+            input = new Array(end - start);
+            for (var i = 0; start < end; start++, i++) {
+                input[i] = start;
+            }
+
+            return input;
+        }
+    });
+    app.directive("pagination", function($compile) {
+        return {
+            restrict: "E",
+            scope: {
+                pageCount:'=',
+                currentPage:'=',
+                fn:'='
+            },
+            templateUrl: 'pagination-template.html',
+        
+            link: function(scope, elem, attrs) {
+                scope.data = {}; 
+                scope.lowerLimit = function(){
+                    var low = scope.currentPage - (Math.ceil(5/2) - 1);
+                    if((scope.pageCount - 5) < low){
+                        return Math.max(scope.pageCount - 5, 0);
+                    }
+                    return Math.max(low, 0);
+                }
+                scope.isNotFirstPage = function(){
+                    return scope.currentPage !== 0
+                }
+                scope.isNotLastPage = function(){
+                    return scope.currentPage !== scope.pageCount - 1
+                }
+                scope.gotoPage = function(page){
+                    if(page == 'next'){
+                        scope.currentPage =+ 1;
+                    }else if(page == 'prev'){
+                        scope.currentPage -= 1;
+                    }else if(page == 'first'){
+                        scope.currentPage = 0;
+                    }else if(page == 'last'){
+                        scope.currentPage = scope.pageCount - 1;
+                    }else{
+                        scope.currentPage = page;
+                    }
+                    scope.fn(scope.currentPage);
+                }
+                scope.goto = function(page){
+                    if(isNaN(page)){
+                        scope.page = {};
+                        alert('Please Enter Valid Page Number.Page Number Should be within 1 to '+scope.pageCount, 'Warning');
+                    }else{
+                        if(Number(page) >= 1 && Number(page) <= scope.pageCount){
+                            scope.gotoPage(Number(page) - 1);
+                        }else{
+                            scope.page = {};
+                            alert('Page Number Should be within 1 to '+scope.pageCount, 'Warning');
+                        }
+                    }
+                }
+            }
+        };
+    });
+    </script>
+</body>
+
+</html>
